@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.14)
+project(shadow)
+
+set(CMAKE_CXX_STANDARD 14)
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#set(CMAKE_CXX_FLAGS -fsanitize=address)
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+#SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+#SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+
+add_executable(shadow_client client.cpp proto/protocol.cpp proto/protocol.h proto/socks5.cpp proto/socks5.h proto/scs.cpp proto/scs.h unit/ip_lib.cpp unit/ip_lib.h chain_build.h proto/SC.cpp proto/SC.h unit/crypto.cpp unit/crypto.h)
+add_executable(shadow_server server.cpp proto/protocol.cpp proto/protocol.h proto/socks5.cpp proto/socks5.h proto/scs.cpp proto/scs.h unit/ip_lib.cpp unit/ip_lib.h chain_build.h proto/SC.cpp proto/SC.h unit/crypto.cpp unit/crypto.h)
+target_link_libraries(shadow_client Coroutine)
+target_link_libraries(shadow_server Coroutine)
+target_link_libraries(shadow_client crypto)
+target_link_libraries(shadow_server crypto)
