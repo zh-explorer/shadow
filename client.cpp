@@ -14,6 +14,9 @@
 #include <csignal>
 #include <zconf.h>
 
+char *target_host;
+unsigned short target_port;
+
 int server_chain_builder(aio *io) {
     auto pipes = create_pipe();
     pipes.first->fileno = io->fileno;
@@ -35,7 +38,7 @@ int server_chain_builder(aio *io) {
 int client_chain_builder(protocol *server, char *url, unsigned short port) {
     auto *client = new aio_client(AF_INET, SOCK_STREAM, 0);
 
-    auto re = client->connect("127.0.0.1", 12345);
+    auto re = client->connect(target_host, target_port);
     if (re == -1) {
         logger(ERR, stderr, "connection client failed: %s", strerror(errno));
         return -1;
@@ -75,7 +78,7 @@ int run_server() {
         logger(ERR, stderr, "set socket opt error");
         exit(-1);
     }
-    auto re = server->bind(9999);
+    auto re = server->bind(1080);
     if (re != 0) {
         logger(ERR, stderr, "bind error: %s", strerror(errno));
         exit(-1);
@@ -93,7 +96,13 @@ int run_server() {
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("%s: ip port\n", argv[0]);
+        exit(0);
+    }
+    target_host =  argv[1];
+    target_port = atoi(argv[2]);
 //    auto *coro = new Coroutine(reinterpret_cast<void *(*)(void *)>(run_server), nullptr);
     auto *coro = new Coroutine(run_server);
     auto *e = new EventLoop;
