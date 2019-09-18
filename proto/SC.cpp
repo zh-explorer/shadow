@@ -50,7 +50,6 @@ void SC::enc_proto() {
         unsigned char buffer[2048];
         sc_package *pack;
         auto data_size = prev->read(buffer, 2048, READ_ANY);
-
         if (data_size == -1) {
             close_ret;
         }
@@ -143,9 +142,9 @@ void SC::dec_proto() {
             close_ret;
         }
 
+        assert(pack.length >= 80);
         unsigned int data_size = pack.length - pack.random_len - 80;
-        auto enc_data = (unsigned char *) malloc(data_size + 1);
-        auto dec_data = (char *) enc_data;
+        auto enc_data = (unsigned char *) malloc(data_size);
 
         auto re = next->read(enc_data, data_size);
         if (re == -1) {
@@ -177,7 +176,7 @@ void SC::dec_proto() {
             close_ret;
         }
 
-        auto pad = dec_data[data_size - 1];
+        auto pad = enc_data[data_size - 1];
         assert(pad <= 16);
         re = prev->write(enc_data, data_size - pad);
         if (re == -1) {

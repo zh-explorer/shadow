@@ -30,7 +30,7 @@ int PIPE::read(unsigned char *buffer, unsigned int size, enum PIPE_READ_MODE mod
             while (!arrayBuf.length()) {
                 add_event(this, -1);
                 wait_event();
-                if (is_closed) {
+                if (is_closed && arrayBuf.length() == 0) {
                     return -1;
                 }
             }
@@ -46,7 +46,7 @@ int PIPE::read(unsigned char *buffer, unsigned int size, enum PIPE_READ_MODE mod
         while (!arrayBuf.length()) {
             add_event(this, -1);
             wait_event();
-            if (is_closed) {
+            if (is_closed && arrayBuf.length() == 0) {
                 return -1;
             }
         }
@@ -197,6 +197,7 @@ void fd_transport::transport_to() {
             io->close();
             return;
         }
+
         auto write_re = prev->write(buffer, read_re);
         if (write_re == -1) {
             prev->close();
